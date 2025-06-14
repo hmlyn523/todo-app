@@ -48,6 +48,31 @@ export default function Home() {
     fetchTodos();
   };
 
+  const toggleDone = async (id: string, done: boolean) => {
+    const { error } = await supabase
+    .from('todos')
+    .update({ done: !done })
+    .eq('id', id);
+
+    if (error) {
+      console.error('更新エラー:', error.message);
+      return;
+    }
+
+    fetchTodos(); // 再読み込み
+  };
+
+  const deleteTodo = async (id: string) => {
+    const { error } = await supabase.from('todos').delete().eq('id', id);
+    if (error) {
+      console.error('削除エラー:', error.message);
+      return;
+    }
+    fetchTodos();
+  };
+
+  const [showAll, setShowAll] = useState(true);
+
   return (
     <main className="min-h-screen p-8 font-sans bg-gray-50 text-gray-800">
       <h1 className="text-2xl font-bold mb-6">📝 ToDo List</h1>
@@ -69,13 +94,38 @@ export default function Home() {
       </div>
 
       <ul className="space-y-2">
-        {todos.map((todo) => (
+        {todos
+          .filter((todo) => showAll || !todo.done)
+          .map((todo) => (
           <li
             key={todo.id}
-            className="bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center"
+            className="bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center justify-between"
           >
-            <span className="mr-2">{todo.done ? '✅' : '🔲'}</span>
-            <span>{todo.content}</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => toggleDone(todo.id, todo.done)}
+                className="text-xl"
+              >
+                {todo.done ? '✅' : '🔲'}
+              </button>
+              <span className={todo.done ? 'line-through text-gray-400' : ''}>
+                {todo.content}
+              </span>
+              <button
+                onClick={() => deleteTodo(todo.id)}
+                className="text-red-500 hover:text-red-700 text-sm"
+              >
+                🗑️
+              </button>
+            </div>
+            <div className="mb-4">
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="text-sm text-black-600 underline"
+              >
+                {showAll ? '未完了のみ' : 'すべて'}
+              </button>
+            </div>
           </li>
         ))}
       </ul>
