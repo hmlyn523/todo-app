@@ -161,7 +161,7 @@ export default function Home() {
 
   return (
     <main className="max-w-xl mx-auto mt-10 px-4">
-      <h1 className="text-2xl font-bold mb-4">ToDo List</h1>
+      <h1 className="text-2xl font-bold mb-4">Simple ToDo List</h1>
 
       <div className="flex gap-4 mb-4">
         <button onClick={() => setShowAddForm(!showAddForm)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
@@ -237,7 +237,7 @@ export default function Home() {
             <select
               value={searchDone}
               onChange={(e) => setSearchDone(e.target.value as 'all' | 'done' | 'notDone')}
-              className="border p-2 rounded">
+              className="border rounded h-10 text-base px-3">
               <option value="all">All</option>
               <option value="done">Completion</option>
               <option value="notDone">Incomplete</option>
@@ -299,8 +299,8 @@ export default function Home() {
               <div className="flex items-start gap-2">
                 <button
                   onClick={() => toggleDone(todo.id, todo.done)}
-                  className="text-base">
-                  {todo.done ? '✅' : '🔲'}
+                  className="text-xl leading-none pt-1">
+                  <span className="align-middle">{todo.done ? '☑️' : '🔲'}</span>
                 </button>
 
                 {editingId === todo.id ? (
@@ -331,8 +331,8 @@ export default function Home() {
                 ) : (
                   <div>
                     <p className={todo.done ?
-                      'text-base whitespace-pre-wrap break-words text-gray-500 line-through' :
-                      'text-base whitespace-pre-wrap break-words'}>
+                      'text-base whitespace-pre-wrap break-words text-xl text-gray-500 line-through' :
+                      'text-base whitespace-pre-wrap break-words text-xl'}>
                       {todo.content}
                     </p>
                     <p className="text-base">
