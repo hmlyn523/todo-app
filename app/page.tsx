@@ -157,18 +157,18 @@ export default function Home() {
   };
 
   // ページ数計算
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
     <main className="max-w-xl mx-auto mt-10 px-4">
-      <h1 className="text-2xl font-bold mb-4">ToDo リスト</h1>
+      <h1 className="text-2xl font-bold mb-4">ToDo List</h1>
 
       <div className="flex gap-4 mb-4">
         <button onClick={() => setShowAddForm(!showAddForm)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-          ➕ ToDo追加
+          ➕ Add
         </button>
         <button onClick={() => setShowSearchForm(!showSearchForm)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          🔍 検索
+          🔍 Search
         </button>
       </div>
 
@@ -176,7 +176,7 @@ export default function Home() {
         <div className="flex flex-col gap-2 mb-4">
           <input
             type="text"
-            placeholder="（必須）ToDo 内容"
+            placeholder="(Required) ToDo Contents"
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
             className="border p-2 rounded"/>
@@ -184,35 +184,35 @@ export default function Home() {
             type="date"
             value={newDueDate}
             onChange={(e) => setNewDueDate(e.target.value)}
-            placeholder="（任意）締切日"
+            placeholder="(Optional) Deadline"
             className="border p-2 rounded"/>
           <input
             type="text"
-            placeholder="（任意）カテゴリ"
+            placeholder="(Optional) Category"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             className="border p-2 rounded"/>
           <input
             type="text"
-            placeholder="（任意）タグ（カンマ・空白区切り）"
+            placeholder="(Optional) Tags (separated by commas and spaces)"
             value={newTags}
             onChange={(e) => setNewTags(e.target.value)}
             className="border p-2 rounded"/>
           <button
             onClick={addTodo}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            追加
+            OK
           </button>
         </div>
       )}
 
       {showSearchForm && (
         <div className="border-t mt-6 pt-4">
-          <h2 className="font-semibold mb-2">🔍 検索フィルター</h2>
+          <h2 className="font-semibold mb-2">🔍 Search Filters</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="text"
-              placeholder="ToDo 内容"
+              placeholder="ToDo Contents"
               value={searchContent}
               onChange={(e) => setSearchContent(e.target.value)}
               className="border p-2 rounded"/>
@@ -220,17 +220,17 @@ export default function Home() {
               type="date"
               value={searchDate}
               onChange={(e) => setSearchDate(e.target.value)}
-              placeholder="（任意）締切日"
+              placeholder="(Optional) Deadline"
               className="border p-2 rounded"/>
             <input
               type="text"
-              placeholder="カテゴリ"
+              placeholder="Category"
               value={searchCategory}
               onChange={(e) => setSearchCategory(e.target.value)}
               className="border p-2 rounded"/>
             <input
               type="text"
-              placeholder="タグ"
+              placeholder="Tag"
               value={searchTag}
               onChange={(e) => setSearchTag(e.target.value)}
               className="border p-2 rounded"/>
@@ -238,9 +238,9 @@ export default function Home() {
               value={searchDone}
               onChange={(e) => setSearchDone(e.target.value as 'all' | 'done' | 'notDone')}
               className="border p-2 rounded">
-              <option value="all">すべて</option>
-              <option value="done">完了</option>
-              <option value="notDone">未完了</option>
+              <option value="all">All</option>
+              <option value="done">Completion</option>
+              <option value="notDone">Incomplete</option>
             </select>
             <button
               onClick={() => {
@@ -259,31 +259,32 @@ export default function Home() {
       )}
 
       <div className="border-t mt-6 pt-4">
-        <div className="mb-4">
-          <label className="mr-2 font-semibold">完了済みを表示:</label>
+        <div className="mb-4 flex items-center">
+          <label className="mr-2 font-semibold">Show Completed:</label>
           <input
             type="checkbox"
             checked={showAll}
+            className="w-5 h-5 scale-100"
             onChange={(e) => setShowAll(e.target.checked)}/>
         </div>
       </div>
 
       <div className="my-4">
-        <p>検索結果: {totalCount}件（{page} / {totalPages}ページ）</p>
+        <p>Number of ToDos: {totalCount}case（{page} / {totalPages}page）</p>
         <div className="flex gap-2 mt-2">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
-            className="bg-gray-300 px-3 py-1.5 rounded disabled:opacity-50"
+            className="bg-gray-400 px-3 py-1.5 rounded disabled:opacity-50"
           >
-            ◀ 前
+            Prev
           </button>
           <button
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
-            className="bg-gray-300 px-3 py-1.5 rounded disabled:opacity-50"
+            className="bg-gray-400 px-3 py-1.5 rounded disabled:opacity-50"
           >
-            次 ▶
+            Next
           </button>
         </div>
       </div>
@@ -294,11 +295,11 @@ export default function Home() {
           .map((todo) => (
             <li
               key={todo.id}
-              className="bg-white border border-gray-200 rounded p-3 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between">
+              className="border border-gray-200 rounded p-3 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between">
               <div className="flex items-start gap-2">
                 <button
                   onClick={() => toggleDone(todo.id, todo.done)}
-                  className="text-xl">
+                  className="text-base">
                   {todo.done ? '✅' : '🔲'}
                 </button>
 
@@ -316,26 +317,28 @@ export default function Home() {
                       className="border p-1 rounded"/>
                     <input
                       type="text"
-                      placeholder="カテゴリ"
+                      placeholder="Category"
                       value={editingCategory}
                       onChange={(e) => setEditingCategory(e.target.value)}
                       className="border p-1 rounded"/>
                     <input
                       type="text"
-                      placeholder="タグ"
+                      placeholder="Tag"
                       value={editingTags}
                       onChange={(e) => setEditingTags(e.target.value)}
                       className="border p-1 rounded"/>
                   </div>
                 ) : (
                   <div>
-                    <p className={todo.done ? 'whitespace-pre-wrap break-words line-through text-gray-400' : 'whitespace-pre-wrap break-words'}>
+                    <p className={todo.done ?
+                      'text-base whitespace-pre-wrap break-words text-gray-500 line-through' :
+                      'text-base whitespace-pre-wrap break-words'}>
                       {todo.content}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      {todo.due_date ? `締切: ${todo.due_date}` : ''}
-                      {todo.category ? ` / カテゴリ: ${todo.category}` : ''}
-                      {todo.tags?.length ? ` / タグ: ${todo.tags.join(', ')}` : ''}
+                    <p className="text-base">
+                      {todo.due_date ? `Cofferdam: ${todo.due_date}` : ''}
+                      {todo.category ? ` / Category: ${todo.category}` : ''}
+                      {todo.tags?.length ? ` / Tag: ${todo.tags.join(', ')}` : ''}
                     </p>
                   </div>
                 )}
@@ -345,8 +348,8 @@ export default function Home() {
                 {editingId === todo.id ? (
                   <button
                     onClick={() => updateTodo(todo.id)}
-                    className="text-green-500 text-sm">
-                    保存
+                    className="text-green-500">
+                    💾 Save
                   </button>
                 ) : (
                   <button
@@ -357,14 +360,14 @@ export default function Home() {
                       setEditingCategory(todo.category || '');
                       setEditingTags(todo.tags?.join(' ') || '');
                     }}
-                    className="text-blue-500 text-sm">
-                    ✏️ 編集
+                    className="text-blue-500">
+                    ✏️ Edit
                   </button>
                 )}
                 <button
                   onClick={() => deleteTodo(todo.id)}
-                  className="text-red-500 text-sm">
-                  🗑️ 削除
+                  className="text-red-500">
+                  🗑️ Delete
                 </button>
               </div>
             </li>
