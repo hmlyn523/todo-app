@@ -95,6 +95,7 @@ export default function Home() {
       setNewDueDate('');
       setNewCategory('');
       setNewTags('');
+      setShowAddForm(false);
       fetchTodos();
     }
   };
@@ -250,7 +251,7 @@ export default function Home() {
             <li
               key={todo.id}
               className="bg-white border border-gray-200 rounded p-3 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between">
-              <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
+              <div className="flex items-start gap-2">
                 <button
                   onClick={() => toggleDone(todo.id, todo.done)}
                   className="text-xl">
@@ -284,7 +285,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div>
-                    <p className={todo.done ? 'line-through text-gray-400' : ''}>
+                    <p className={todo.done ? 'whitespace-pre-wrap break-words line-through text-gray-400' : 'whitespace-pre-wrap break-words'}>
                       {todo.content}
                     </p>
                     <p className="text-sm text-gray-500">
