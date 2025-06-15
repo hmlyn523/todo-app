@@ -33,6 +33,9 @@ export default function Home() {
   const [searchTag, setSearchTag] = useState('');
   const [searchDone, setSearchDone] = useState<'all' | 'done' | 'notDone'>('all');
 
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showSearchForm, setShowSearchForm] = useState(false);
+
   const fetchTodos = async () => {
     let query = supabase.from('todos').select('*');
 
@@ -138,84 +141,97 @@ export default function Home() {
     <main className="max-w-xl mx-auto mt-10 px-4">
       <h1 className="text-2xl font-bold mb-4">ToDo リスト</h1>
 
-      <div className="flex flex-col gap-2 mb-4">
-        <input
-          type="text"
-          placeholder="（必須）ToDo 内容"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          className="border p-2 rounded"/>
-        <input
-          type="date"
-          value={newDueDate}
-          onChange={(e) => setNewDueDate(e.target.value)}
-          className="border p-2 rounded"/>
-        <input
-          type="text"
-          placeholder="（任意）カテゴリ"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-          className="border p-2 rounded"/>
-        <input
-          type="text"
-          placeholder="（任意）タグ（カンマ・空白区切り）"
-          value={newTags}
-          onChange={(e) => setNewTags(e.target.value)}
-          className="border p-2 rounded"/>
-        <button
-          onClick={addTodo}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          追加
+      <div className="flex gap-4 mb-4">
+        <button onClick={() => setShowAddForm(!showAddForm)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+          ➕ ToDo追加
+        </button>
+        <button onClick={() => setShowSearchForm(!showSearchForm)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          🔍 検索
         </button>
       </div>
 
-      <div className="border-t mt-6 pt-4">
-        <h2 className="font-semibold mb-2">🔍 検索フィルター</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {showAddForm && (
+        <div className="flex flex-col gap-2 mb-4">
           <input
             type="text"
-            placeholder="ToDo 内容"
-            value={searchContent}
-            onChange={(e) => setSearchContent(e.target.value)}
-            className="border p-2 rounded"
-          />
+            placeholder="（必須）ToDo 内容"
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+            className="border p-2 rounded"/>
           <input
             type="date"
-            value={searchDate}
-            onChange={(e) => setSearchDate(e.target.value)}
-            className="border p-2 rounded"
-          />
+            value={newDueDate}
+            onChange={(e) => setNewDueDate(e.target.value)}
+            className="border p-2 rounded"/>
           <input
             type="text"
-            placeholder="カテゴリ"
-            value={searchCategory}
-            onChange={(e) => setSearchCategory(e.target.value)}
-            className="border p-2 rounded"
-          />
+            placeholder="（任意）カテゴリ"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            className="border p-2 rounded"/>
           <input
             type="text"
-            placeholder="タグ"
-            value={searchTag}
-            onChange={(e) => setSearchTag(e.target.value)}
-            className="border p-2 rounded"
-          />
-          <select
-            value={searchDone}
-            onChange={(e) => setSearchDone(e.target.value as 'all' | 'done' | 'notDone')}
-            className="border p-2 rounded"
-          >
-            <option value="all">すべて</option>
-            <option value="done">完了</option>
-            <option value="notDone">未完了</option>
-          </select>
+            placeholder="（任意）タグ（カンマ・空白区切り）"
+            value={newTags}
+            onChange={(e) => setNewTags(e.target.value)}
+            className="border p-2 rounded"/>
           <button
-            onClick={fetchTodos}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            検索
+            onClick={addTodo}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            追加
           </button>
         </div>
-      </div>
+      )}
+
+      {showSearchForm && (
+        <div className="border-t mt-6 pt-4">
+          <h2 className="font-semibold mb-2">🔍 検索フィルター</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input
+              type="text"
+              placeholder="ToDo 内容"
+              value={searchContent}
+              onChange={(e) => setSearchContent(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <input
+              type="date"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <input
+              type="text"
+              placeholder="カテゴリ"
+              value={searchCategory}
+              onChange={(e) => setSearchCategory(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <input
+              type="text"
+              placeholder="タグ"
+              value={searchTag}
+              onChange={(e) => setSearchTag(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <select
+              value={searchDone}
+              onChange={(e) => setSearchDone(e.target.value as 'all' | 'done' | 'notDone')}
+              className="border p-2 rounded"
+            >
+              <option value="all">すべて</option>
+              <option value="done">完了</option>
+              <option value="notDone">未完了</option>
+            </select>
+            <button
+              onClick={fetchTodos}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              検索
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="border-t mt-6 pt-4">
         <div className="mb-4">
