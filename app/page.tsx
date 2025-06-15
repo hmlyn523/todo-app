@@ -71,7 +71,27 @@ export default function Home() {
     fetchTodos();
   };
 
-  const [showAll, setShowAll] = useState(true);
+  const [showAll, setShowAll] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState('');
+
+  const updateTodo = async (id: string) => {
+    if (!editingContent.trim()) return;
+
+    const { error } = await supabase
+      .from('todos')
+      .update({ content: editingContent })
+      .eq('id', id);
+
+    if (error) {
+      console.error('更新エラー:', error.message);
+      return;
+    }
+
+    setEditingId(null);
+    setEditingContent('');
+    fetchTodos();
+  };
 
   return (
     <main className="min-h-screen p-8 font-sans bg-gray-50 text-gray-800">
@@ -97,37 +117,62 @@ export default function Home() {
         {todos
           .filter((todo) => showAll || !todo.done)
           .map((todo) => (
-          <li
-            key={todo.id}
-            className="bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center justify-between"
-          >
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => toggleDone(todo.id, todo.done)}
-                className="text-xl"
-              >
-                {todo.done ? '✅' : '🔲'}
-              </button>
-              <span className={todo.done ? 'line-through text-gray-400' : ''}>
-                {todo.content}
-              </span>
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                🗑️
-              </button>
-            </div>
-            <div className="mb-4">
-              <button
-                onClick={() => setShowAll(!showAll)}
-                className="text-sm text-black-600 underline"
-              >
-                {showAll ? '未完了のみ' : 'すべて'}
-              </button>
-            </div>
-          </li>
-        ))}
+            <li
+              key={todo.id}
+              className="bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toggleDone(todo.id, todo.done)}
+                  className="text-xl">
+                  {todo.done ? '✅' : '🔲'}
+                </button>
+                {editingId === todo.id ? (
+                  <input
+                    type="text"
+                    value={editingContent}
+                    onChange={(e) => setEditingContent(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        updateTodo(todo.id);
+                      }
+                    }}
+                    className="border p-1 rounded"/>
+                ) : (
+                  <span className={todo.done ? 'line-through text-gray-400' : ''}>
+                    {todo.content}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {editingId === todo.id ? (
+                  <button
+                    onClick={() => updateTodo(todo.id)}
+                    className="text-green-500 text-sm">
+                    保存
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditingId(todo.id);
+                      setEditingContent(todo.content);
+                    }}
+                    className="text-blue-500 text-sm">
+                    ✏️ 編集
+                  </button>
+                )}
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                  className="text-red-500 text-sm">
+                  🗑️
+                </button>
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="text-sm text-black-600 underline">
+                  {showAll ? '未完了のみ' : 'すべて'}
+                </button>
+              </div>
+            </li>
+          ))}
       </ul>
     </main>
   );
