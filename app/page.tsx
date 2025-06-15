@@ -36,8 +36,13 @@ export default function Home() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSearchForm, setShowSearchForm] = useState(false);
 
+    // ページング用状態
+  const [page, setPage] = useState(1);
+  const pageSize = 5; // 1ページあたりの件数
+  const [totalCount, setTotalCount] = useState(0);
+
   const fetchTodos = async () => {
-    let query = supabase.from('todos').select('*');
+    let query = supabase.from('todos').select('*', { count: 'exact' });
 
     // 各種フィルター条件の追加
     if (searchContent.trim() !== '') {
@@ -60,17 +65,29 @@ export default function Home() {
 
     query = query.order('created_at', { ascending: false });
 
-    const { data, error } = await query;
+    // ページング指定
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
     if (error) {
       console.error(error);
     } else {
       setTodos(data as Todo[]);
+      setTotalCount(count || 0);
     }
   };
 
+    // ページ変更時や検索条件が変わったら1ページ目に戻すためのeffect
+  useEffect(() => {
+    setPage(1);
+  }, [searchContent, searchDate, searchCategory, searchTag, searchDone]);
+
+
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [page, searchContent, searchDate, searchCategory, searchTag, searchDone]);
 
   const addTodo = async () => {
     if (!newTodo.trim()) return;
@@ -96,6 +113,7 @@ export default function Home() {
       setNewCategory('');
       setNewTags('');
       setShowAddForm(false);
+      setPage(1);
       fetchTodos();
     }
   };
@@ -137,6 +155,9 @@ export default function Home() {
       fetchTodos();
     }
   };
+
+  // ページ数計算
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <main className="max-w-xl mx-auto mt-10 px-4">
@@ -194,43 +215,44 @@ export default function Home() {
               placeholder="ToDo 内容"
               value={searchContent}
               onChange={(e) => setSearchContent(e.target.value)}
-              className="border p-2 rounded"
-            />
+              className="border p-2 rounded"/>
             <input
               type="date"
               value={searchDate}
               onChange={(e) => setSearchDate(e.target.value)}
               placeholder="（任意）締切日"
-              className="border p-2 rounded"
-            />
+              className="border p-2 rounded"/>
             <input
               type="text"
               placeholder="カテゴリ"
               value={searchCategory}
               onChange={(e) => setSearchCategory(e.target.value)}
-              className="border p-2 rounded"
-            />
+              className="border p-2 rounded"/>
             <input
               type="text"
               placeholder="タグ"
               value={searchTag}
               onChange={(e) => setSearchTag(e.target.value)}
-              className="border p-2 rounded"
-            />
+              className="border p-2 rounded"/>
             <select
               value={searchDone}
               onChange={(e) => setSearchDone(e.target.value as 'all' | 'done' | 'notDone')}
-              className="border p-2 rounded"
-            >
+              className="border p-2 rounded">
               <option value="all">すべて</option>
               <option value="done">完了</option>
               <option value="notDone">未完了</option>
             </select>
             <button
-              onClick={fetchTodos}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              検索
+              onClick={() => {
+                setSearchContent('');
+                setSearchDate('');
+                setSearchCategory('');
+                setSearchTag('');
+                setSearchDone('all');
+                setPage(1);
+              }}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+              🧹 クリア
             </button>
           </div>
         </div>
@@ -243,6 +265,26 @@ export default function Home() {
             type="checkbox"
             checked={showAll}
             onChange={(e) => setShowAll(e.target.checked)}/>
+        </div>
+      </div>
+
+      <div className="my-4">
+        <p>検索結果: {totalCount}件（{page} / {totalPages}ページ）</p>
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="bg-gray-300 px-3 py-1.5 rounded disabled:opacity-50"
+          >
+            ◀ 前
+          </button>
+          <button
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            className="bg-gray-300 px-3 py-1.5 rounded disabled:opacity-50"
+          >
+            次 ▶
+          </button>
         </div>
       </div>
 
