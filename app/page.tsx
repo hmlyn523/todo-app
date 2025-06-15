@@ -19,7 +19,7 @@ export default function Home() {
   const [newDueDate, setNewDueDate] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [newTags, setNewTags] = useState('');
-  const [showAll, setShowAll] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
@@ -163,6 +163,7 @@ export default function Home() {
             type="date"
             value={newDueDate}
             onChange={(e) => setNewDueDate(e.target.value)}
+            placeholder="（任意）締切日"
             className="border p-2 rounded"/>
           <input
             type="text"
@@ -199,6 +200,7 @@ export default function Home() {
               type="date"
               value={searchDate}
               onChange={(e) => setSearchDate(e.target.value)}
+              placeholder="（任意）締切日"
               className="border p-2 rounded"
             />
             <input
